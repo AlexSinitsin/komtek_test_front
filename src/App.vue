@@ -12,7 +12,7 @@ export default {
 
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&family=Roboto:wght@400;700&display=swap');
 
 #app {
   font-family: 'Roboto', Helvetica, Arial, sans-serif;

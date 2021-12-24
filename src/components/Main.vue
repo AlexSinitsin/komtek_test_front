@@ -61,5 +61,6 @@ import Users from '@/components/Users.vue'
     width: 1180px;
     margin: 0px auto;
   }
+  
 
 </style>

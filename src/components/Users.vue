@@ -52,7 +52,12 @@
       </div>
       <input type="submit" class="button" value="Добавить">
     </form>
-    <table class="users_table">
+    <table class="table">
+      <tr>
+        <th>Пользователь</th>
+        <th>Почьта</th>
+        <th>Редактирование</th>
+      </tr>
       <tr class="user" v-for="user in updateUsers" :key="user.id">
         <td>
           <div @click="openUser()" :data-userId="user.id" class="user_link">
@@ -66,7 +71,8 @@
         </td>
       </tr>
     </table>
-    <form class="popap_form" @submit.prevent="editUser()" v-show="updateOpenForm">
+    <div class="popap_form" v-show="updateOpenForm">
+      <form class="form" @submit.prevent="editUser()">
       <div>
         <input type="email" name="email" v-model="updateEditedUser.email" placeholder="Email"
           @blur="$v.editedUser.email.$touch()" :class="{ 'input_error': $v.editedUser.email.$error }">
@@ -116,8 +122,8 @@
         </span>
       </div>
       <input type="submit" class="button" value="Редактировать профиль">
-      <button type="submit" class="button" @click="closeForm()">close</button>
     </form>
+    </div>
   </div>
 </template>
 
@@ -163,7 +169,6 @@
           email: email,
           unic: function (val) {
             if (this.users.length > 0) {
-       //       console.log(val)
               return this.users.filter(user => user.email === val).length === 0
             }
             return true
@@ -236,6 +241,7 @@
           for (const key in this.user) {
             this.user[key] = '';
           }
+          this.user.reports = [];
           this.$emit('updateUsers', [this.users, true])
           this.$v.user.$reset()
         }
@@ -254,9 +260,6 @@
         this.editUserId = id;
 
       },
-      closeForm() {
-        this.openFormFlag = false;
-      },
       editUser() {
         let flag = true;
         for (const param in this.$v.editedUser) {
@@ -266,10 +269,7 @@
         }
         if (flag) {
           let users = this.users.map(user => {
-        //    console.log(user.id)
-       //     console.log(this.editUserId)
             if (user.id === this.editUserId) {
-       //       console.log(this.editedUser)
               return {
                 ...this.editedUser
               }
@@ -279,11 +279,12 @@
           this.users = users
           this.$emit('updateUsers', [this.users, true])
           this.$v.editedUser.$reset()
+          this.openFormFlag = false;
         }
       },
       openUser() {
-        let id = Number(event.target.getAttribute('data-userId'))
-        this.$emit('updateUsers', [this.users, false, id])
+        let userId = Number(event.target.getAttribute('data-userId'))
+        this.$emit('updateUsers', [this.users, false, userId])
       }
     }
   }
@@ -296,31 +297,163 @@
     color:rgb(110, 110, 110);
     text-transform: uppercase;
     font-size: 30px;
+    margin-bottom: 60px;
   }
   .form {
     display: flex;
     flex-flow: row wrap;
     justify-content:space-between;
-    width: 1000px;
+    width: 1180px;
   }
   .form > div {
-    width: 480px;
+    position: relative;
+    width: 580px;
     margin-bottom: 20px;
   }
-  .form > div input {
-    width: 480px;
+  .form > div input {  
+    font-family: Roboto;
+    width: 580px;
     box-sizing: border-box;
     padding: 10px 20px;
     border-radius: 5px;
-    border: 2px solid rgb(147, 223, 147);;
+    border: 2px solid rgb(147, 223, 147);
 
   }
-  ::-webkit-input-placeholder {color:rgb(110, 110, 110); font-size: 14px;;}
-::-moz-placeholder          {color:rgb(110, 110, 110)}/* Firefox 19+ */
-:-moz-placeholder           {color:rgb(110, 110, 110)}/* Firefox 18- */
-:-ms-input-placeholder      {color:rgb(110, 110, 110)}
+  ::-webkit-input-placeholder {color:rgb(110, 110, 110); font-size: 14px;}
+::-moz-placeholder          {color:rgb(110, 110, 110); font-size: 14px;}/* Firefox 19+ */
+:-moz-placeholder           {color:rgb(110, 110, 110); font-size: 14px;}/* Firefox 18- */
+:-ms-input-placeholder      {color:rgb(110, 110, 110); font-size: 14px;}
 
   .form .button {
-    width: 1000px;
+    width: 1180px;
+  }
+  .form > div span {
+    position: absolute;
+    background: red;
+    padding: 5px 10px;
+    top: 0px;
+    width: auto;
+    white-space: nowrap;
+    z-index: 1000;
+    border-radius: 50px;
+    border: 1px solid rgb(255, 255, 255);
+    color: white;
+    left: 10px;
+    top: -20px;
+    font-size: 12px;
+  }
+   .form > div span:before {
+    content: '';
+    position: absolute;
+    display: block;
+    border-top: 5px solid red;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    bottom: -9px;
+  }
+  .form > div input.input_error {
+    border-color: red;
+  }
+  .form .button {
+    background: rgb(147, 223, 147);
+    border: 0px;
+    border-radius: 5px;
+    color: rgb(255, 255, 255);
+    box-sizing: border-box;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .button:hover {
+    opacity: 0.7;
+  }
+  .table { 
+    border-collapse: collapse;;
+    width: 100%;
+    color: rgb(110, 110, 110)
+  }
+  .table tr td {
+    padding: 10px 20px;
+    border-right: 1px solid rgb(147, 223, 147);
+    border-bottom: 1px solid rgb(147, 223, 147);
+  }
+  .table tr td:last-child {
+    border-bottom: 1px solid rgb(255, 255, 255);
+  }
+  .table tr:last-child td:last-child {
+    border-bottom: 1px solid rgb(147, 223, 147);
+  }
+  .table tr th {
+    background: rgb(228, 228, 228);
+  }
+  .table tr td:last-child, .table tr th:last-child {
+    width: 80px;
+  }
+  .table tr th {
+    padding: 10px 20px;
+  }
+  .table tr td .user_link {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .table tr td:last-child {
+    background: rgb(147, 223, 147)
+    
+  }
+  .table tr td .edit {
+    width: 100%;
+    height: 100%;
+    border: 0px;
+    background: rgb(147, 223, 147);
+    font-size: 16px;
+    color: white;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .popap_form {
+    position: fixed;
+    background: white;
+    padding: 60px 40px 30px ;
+    box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.2);
+    top: 100px;
+    left: calc(50% - 630px);
+    text-align: center;
+    z-index: 2000
+  }
+  .popap_form .form > div span {
+    z-index: 2000;
+  }
+  .cross {
+    position: absolute;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+  .cross:before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: rgb(0, 0, 0);
+    transform: rotate(45deg);
+    top: 9px;
+    left: -2px
+  }
+  .cross:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: rgb(0, 0, 0);
+    transform: rotate(-45deg);
+    top: 9px;
+    left: -2px
   }
 </style>
